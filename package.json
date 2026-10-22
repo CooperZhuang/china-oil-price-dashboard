@@ -1,0 +1,13 @@
+{
+  "name": "oil-price-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "全国成品油挂牌价看板，纯静态 HTML+CSS+JS，数据取自公开接口",
+  "scripts": {
+    "start": "node serve.mjs",
+    "dev": "node --watch serve.mjs",
+    "test": "node tools/check.mjs",
+    "shot": "node tools/shot.mjs"
+  }
+}

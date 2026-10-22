@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="全国各省市成品油挂牌价看板：92#/95#/98# 汽油与 0# 柴油，含涨跌、均价与历史调价趋势。">
+<title>油价看板 | 全国成品油挂牌价</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">跳到主内容</a>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <div class="brand">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span class="brand__name">油价看板</span>
+    </div>
+
+    <div class="topbar__tools">
+      <label class="field">
+        <span class="field__label">地区</span>
+        <select id="region-select" class="select" aria-label="选择省市"></select>
+      </label>
+
+      <button id="refresh" class="icon-btn" type="button" title="重新拉取数据" aria-label="重新拉取数据">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+          <path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4" fill="none" stroke="currentColor"
+                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <button id="theme-toggle" class="icon-btn" type="button" title="切换主题" aria-label="切换主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"
+                fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+          <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.2 8.2 0 1 0 10.2 10.2Z"
+                fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="page">
+
+  <!-- 加载骨架 -->
+  <div id="skeleton" class="skeleton" hidden aria-hidden="true">
+    <div class="skeleton__hero"></div>
+    <div class="skeleton__row"></div>
+    <div class="skeleton__row skeleton__row--short"></div>
+  </div>
+
+  <!-- 错误态 -->
+  <div id="error-panel" class="panel panel--error" hidden role="alert">
+    <h2 class="panel__title">数据没拉下来</h2>
+    <p class="panel__body" id="error-message">未知错误</p>
+    <div class="panel__actions">
+      <button id="retry" class="btn btn--primary" type="button">重试</button>
+      <button id="use-snapshot" class="btn btn--ghost" type="button">使用本地快照</button>
+    </div>
+  </div>
+
+  <div id="content" hidden>
+
+    <!-- 主数据区 -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__main">
+        <p class="hero__eyebrow" id="hero-region">定位中</p>
+        <h1 class="hero__title" id="hero-title">92# 汽油</h1>
+        <p class="hero__price">
+          <span class="hero__amount num" id="hero-price">--</span>
+          <span class="hero__unit">元 / 升</span>
+        </p>
+        <p class="hero__delta" id="hero-delta">--</p>
+        <div class="seg seg--fuel" role="group" aria-label="选择油品" id="fuel-seg"></div>
+      </div>
+
+      <dl class="stats">
+        <div class="stat">
+          <dt class="stat__k">全国均价</dt>
+          <dd class="stat__v num" id="stat-avg">--</dd>
+          <dd class="stat__s" id="stat-avg-sub">31 省市算术平均</dd>
+        </div>
+        <div class="stat">
+          <dt class="stat__k">本轮涨跌</dt>
+          <dd class="stat__v num" id="stat-chg">--</dd>
+          <dd class="stat__s" id="stat-chg-sub">较上一调价窗口</dd>
+        </div>
+        <div class="stat">
+          <dt class="stat__k">下次调价窗口</dt>
+          <dd class="stat__v num" id="stat-next">--</dd>
+          <dd class="stat__s" id="stat-next-sub">按 10 个工作日推算</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- 本地油品 -->
+    <section class="section" aria-labelledby="fuels-title">
+      <div class="section__head">
+        <h2 class="section__title" id="fuels-title">本地挂牌价</h2>
+        <p class="section__note" id="fuels-note">--</p>
+      </div>
+      <div class="fuel-grid" id="fuel-grid"></div>
+    </section>
+
+    <!-- 国际原油 -->
+    <section class="section" id="crude-section" aria-labelledby="crude-title" hidden>
+      <div class="section__head">
+        <h2 class="section__title" id="crude-title">国际原油</h2>
+        <p class="section__note" id="crude-note">--</p>
+      </div>
+      <div class="crude-grid" id="crude-grid"></div>
+    </section>
+
+    <!-- 历史趋势 -->
+    <section class="section" aria-labelledby="trend-title">
+      <div class="section__head">
+        <h2 class="section__title" id="trend-title">历史调价趋势</h2>
+        <p class="section__note" id="trend-note">跟随上方选中的油品</p>
+      </div>
+      <figure class="chart-figure">
+        <figcaption class="chart-figure__cap" id="trend-cap">--</figcaption>
+        <div class="chart" id="trend-chart"></div>
+      </figure>
+    </section>
+
+    <!-- 全国表格 -->
+    <section class="section" aria-labelledby="table-title">
+      <div class="section__head">
+        <h2 class="section__title" id="table-title">全国各省市挂牌价</h2>
+        <p class="section__note" id="table-note">--</p>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="nation-table">
+          <caption class="visually-hidden">全国各省市 92# 汽油、95# 汽油、98# 汽油与 0# 柴油挂牌价，单位元每升</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="ta-l"><button class="th-sort" type="button" data-sort="name">地区</button></th>
+              <th scope="col"><button class="th-sort" type="button" data-sort="n92">92# 汽油</button></th>
+              <th scope="col"><button class="th-sort" type="button" data-sort="n95">95# 汽油</button></th>
+              <th scope="col"><button class="th-sort" type="button" data-sort="n98">98# 汽油</button></th>
+              <th scope="col"><button class="th-sort" type="button" data-sort="n0">0# 柴油</button></th>
+              <th scope="col"><button class="th-sort" type="button" data-sort="chg">本轮涨跌</button></th>
+            </tr>
+          </thead>
+          <tbody id="nation-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 来源 -->
+    <section class="section section--slim" aria-labelledby="source-title">
+      <div class="section__head">
+        <h2 class="section__title" id="source-title">数据来源与说明</h2>
+      </div>
+      <div class="prose">
+        <p id="source-line">--</p>
+        <ul class="source-list">
+          <li>价格与涨跌额来自金投网「城市油价」公开数据接口，覆盖 31 个省市自治区的 89#、92#、95#、98# 汽油与 0#、-10# 柴油。</li>
+          <li>「下次调价窗口」按国家发改委调价周期（约 10 个工作日）从最近一次调价日推算，遇法定假日会顺延，仅供参考。</li>
+          <li>本页仅作数据展示与个人参考，实际价格以各地加油站挂牌价和发改委公告为准。</li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <p class="footer__note">本地运行的油价看板，数据实时取自公开接口</p>
+</footer>
+
+<!-- 离线快照用 script 引入：file:// 下 fetch 本地文件会被浏览器拦截，script 标签则不受限 -->
+<script src="data/snapshot.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
