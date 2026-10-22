@@ -2,6 +2,8 @@
 
 一个开源的全国成品油挂牌价看板。纯静态 HTML + CSS + JS，零依赖零构建，下载下来直接打开就能用。
 
+**在线体验：** <https://cooperzhuang.github.io/china-oil-price-dashboard/>
+
 ![暗色主题](docs/screenshots/dark.png)
 
 ## 快速开始
@@ -20,7 +22,7 @@ node serve.mjs 8080     # 换端口
 
 只要 Node 18+（用了内置 `fetch` 和 `AbortSignal.timeout`），不需要 `npm install`。
 
-也可以直接部署到 GitHub Pages：仓库本身就是纯静态站点，把 `main` 分支的根目录设为发布目录即可。
+也可以直接部署到 GitHub Pages：仓库本身就是纯静态站点，把 `main` 分支的根目录设为发布目录即可（本仓库已开启 Pages）。
 
 ## 功能
 
